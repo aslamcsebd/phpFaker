@@ -42,5 +42,8 @@
 	<summary>Code Source</summary>
 		<a href="https://github.com/fzaninotto/Faker">Github link</a>
 		<br>
+		<a href="https://zetcode.com/php/faker/">Tutorial Link</a>
+		<br>
 		<a href="https://www.youtube.com/watch?v=sSDh1zfz-5s&ab_channel=1BestCsharpblog">Youtube link</a>
+		
 </details>
