@@ -1,5 +1,12 @@
 html,
-body{ font-family: unset; height: auto; width: 100%; margin: 0; background-color: darkslategray; background-color: purple; }
+body{ 
+   font-family: unset; 
+   height: auto; 
+   width: 100%; 
+   margin: 0; 
+   background-color: purple;
+   /*background-color: darkslategray; */
+}
 
 .pushmenu { position: fixed; left: 255px; }
 .navbar .ml-auto li{ margin: 0 6px;}

@@ -1,6 +1,6 @@
 
 <nav id="navbar_top" class="navbar navbar-expand-md navbar-light navbar-muted shadow-sm">   
-   <a class="navbar-brand" href="index.php"> Php faker </a>
+   <a class="navbar-brand" href="index.php">Php faker</a>
    <button class="navbar-toggler text-primary" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
    <span class="navbar-toggler-icon"></span>
    </button>
@@ -20,6 +20,12 @@
          <h4>Victory Loves Preparation</h4>  
       </ul>
       <ul class="navbar-nav ml-auto">
+         <?php if(!isset($_SESSION['connectFaker'])){ ?>
+            <li class="nav-item">
+               <a class="nav-link btn btn-sm btn-primary text-light" data-toggle="modal" data-original-title="test" data-target="#fakerConnection">Faker Connection</a>
+            </li>
+         <?php } ?>
+
          <?php if (!isset($_SESSION['dbName'])) { ?>
             <li class="nav-item">
                <a class="nav-link btn btn-sm btn-danger text-light" data-toggle="modal" data-original-title="test" data-target="#dbConnection">Database Connection</a>

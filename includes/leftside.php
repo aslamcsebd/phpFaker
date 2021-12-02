@@ -1,4 +1,27 @@
 <?php
+
+   if(isset($_POST['fakerConn'])){
+      $localhost = $_POST['serverName'];   
+      $userName = $_POST['userName'];
+      $password = $_POST['password'];
+      $dbName = $_POST['dbName'];
+      
+      $conn = mysqli_connect($localhost, $userName, $password, $dbName);
+      
+      if ($conn){
+         $_SESSION['F_localhost'] = $localhost;
+         $_SESSION['F_userName'] = $userName;
+         $_SESSION['F_password'] = $password;
+         $_SESSION['F_dbName'] = $dbName;
+         $_SESSION['connectFaker'] = true;
+
+         $_SESSION['alertSuccess'] = 'Faker database connection successfully';               
+      }else{
+         $_SESSION['alertFail'] = 'Faker database connection fail';
+      }
+      header("Location: index.php");
+   }
+
    if(isset($_POST['dbConn'])){
       $localhost = $_POST['serverName'];   
       $userName = $_POST['userName'];

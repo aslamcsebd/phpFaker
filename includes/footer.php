@@ -3,7 +3,6 @@
    unset($_SESSION['alertSuccess']);
    unset($_SESSION['alertFail']);
 ?>
-
 <!-- jQuery -->
    <script src="assets/js/jquery.min.js"></script>
  
@@ -23,17 +22,17 @@
    
    <script type="text/javascript">
       // if ($(window).width() > 992) {
-      $(window).scroll(function(){
-        if ($(this).scrollTop() > 0) { //default: 40
-           $('#navbar_top').addClass("fixed-top");
-           // add padding top to show content behind navbar
-           $('body').css('padding-top', $('.navbar').outerHeight() + 'px');
-         }else{
-           $('#navbar_top').removeClass("fixed-top");
-            // remove padding top from body
-           $('body').css('padding-top', '0');
-         }   
-      });
+      // $(window).scroll(function(){
+      //   if ($(this).scrollTop() > 0) { //default: 40
+      //      $('#navbar_top').addClass("fixed-top");
+      //      // add padding top to show content behind navbar
+      //      $('body').css('padding-top', $('.navbar').outerHeight() + 'px');
+      //    }else{
+      //      $('#navbar_top').removeClass("fixed-top");
+      //       // remove padding top from body
+      //      $('body').css('padding-top', '0');
+      //    }   
+      // });
       // } // end
 
       window.setTimeout(function() {
@@ -42,8 +41,7 @@
          });
       },2000);
    
-      $(document).ready(function(){
-         $('.table').DataTable();
-      });
+      // $(document).ready(function(){
+      //    $('.table').DataTable();
+      // });
    </script>
-

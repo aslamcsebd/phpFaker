@@ -1,14 +1,19 @@
 <?php 
    session_start();
-   $conn2 =mysqli_connect('localhost', 'root', '', 'php_faker');
+   if (isset($_SESSION['connectFaker'])){
+      function connectFaker(){
+         $conn2 = mysqli_connect($_SESSION['F_localhost'], $_SESSION['F_userName'], $_SESSION['F_password'], $_SESSION['F_dbName']);
+         return $conn2;
+      }
+   }
 ?>
 <!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="en">
    <head>
    <!-- <meta http-equiv="refresh" content="3"/> -->
       <?php include('includes/head.php'); ?>
    </head>
-   <body class="hold-transition sidebar-mini layout-fixed">      
+   <body class="hold-transition sidebar-mini layout-fixed">
       <?php 
          include('includes/header.php');
          include('includes/leftside.php');
@@ -51,12 +56,14 @@
                         <a href="#addData" data-toggle="tab" class="p-2 bg-primary text-light"><i class="fas fa-plus-circle"></i>&nbsp; Add faker data</a>
                      </li>
                   <?php } ?>
-                  <li class="nav-item mx-1">
-                     <a href="#" class="p-2 bg-info text-light" data-toggle="modal" data-original-title="test" data-target="#addFaker"><i class="fas fa-plus-circle"></i>&nbsp; Add faker</a>
-                  </li>     
-                  <li class="nav-item mx-1">
-                     <a href="#fakerList" data-toggle="tab" class="p-2 bg-secondary text-light"><i class="fas fa-list-ul"></i>&nbsp; Faker list</a>
-                  </li>
+                  <?php if(isset($_SESSION['connectFaker'])){?>
+                     <li class="nav-item mx-1">
+                        <a href="#" class="p-2 bg-info text-light" data-toggle="modal" data-original-title="test" data-target="#addFaker"><i class="fas fa-plus-circle"></i>&nbsp; Add faker</a>
+                     </li>     
+                     <li class="nav-item mx-1">
+                        <a href="#fakerList" data-toggle="tab" class="p-2 bg-secondary text-light"><i class="fas fa-list-ul"></i>&nbsp; Faker list</a>
+                     </li>
+                  <?php } ?>
                </ul>               
             </header>
 
@@ -247,6 +254,10 @@
                      <div class="tab-pane" id="addData">
                         <p class="bg-primary text-center mb-2">Table Name : <?= $_SESSION['tableName']; ?></p>
                         <?php
+                           if (connectFaker()==true){
+                              $conn2 = connectFaker();
+                           }
+
                            require_once 'vendor/autoload.php';
                            $faker2 = Faker\Factory::create();
                            
@@ -368,145 +379,149 @@
                   <?php } ?>
                   
                   <!-- Faker list -->
-                  <div class="tab-pane mt-2" id="fakerList">
-                     <?php 
-                        require_once 'vendor/autoload.php';
-                        $faker = Faker\Factory::create();
+                  <?php if(isset($_SESSION['connectFaker'])){ ?>
+                     <div class="tab-pane mt-2" id="fakerList">
+                        <?php
+                           $conn2 = connectFaker();
+                           
+                           require_once 'vendor/autoload.php';
+                           $faker = Faker\Factory::create();
 
-                        $sql = "select * from faker_category";
-                        $fakerCategory = mysqli_query($conn2, $sql);
-                        $fakerCategoryCount = mysqli_num_rows($fakerCategory);
+                           $sql = "select * from faker_category";
+                           $fakerCategory = mysqli_query($conn2, $sql);
+                           $fakerCategoryCount = mysqli_num_rows($fakerCategory);
 
-                        $sql2 = "select * from faker_type";
-                        $fakerType2 = mysqli_query($conn2, $sql2);
-                        $fakerTypeCount = mysqli_num_rows($fakerType2);
+                           $sql2 = "select * from faker_type";
+                           $fakerType2 = mysqli_query($conn2, $sql2);
+                           $fakerTypeCount = mysqli_num_rows($fakerType2);
 
-                     ?>
-                     <fieldset id="accordion" class="p-1">
-                        <legend class="bg-secondary">All Faker category & type [<?=$fakerCategoryCount;?>][<?=$fakerTypeCount;?>]</legend>
-                        <div class="row">
-                           <div class="col">
-                              <table id="table" class="table table-bordered">
-                                 <thead class="text-center table-striped" style="display:none;">
-                                    <tr>
-                                       <th>All Category</th>
-                                    </tr>
-                                 </thead>
-                                 <tbody>
-                                    <tr >
-                                       <td>
-                                          <?php while($row = mysqli_fetch_array($fakerCategory)){ ?>
-                                             <?php
-                                                $category_id = $row['id'];
-                                                $sql2 = "select faker_type.id, faker_type.name, faker_type.status
-                                                   from faker_type inner join faker_category
-                                                   on faker_type.category_id = faker_category.id where faker_category.status='1' and faker_type.category_id='$category_id'";
-                                                $faker_type = mysqli_query($conn2, $sql2);
+                        ?>
+                        <fieldset id="accordion" class="p-1">
+                           <legend class="bg-secondary">All Faker category & type [<?=$fakerCategoryCount;?>][<?=$fakerTypeCount;?>]</legend>
+                           <div class="row">
+                              <div class="col">
+                                 <table id="table" class="table table-bordered">
+                                    <thead class="text-center table-striped" style="display:none;">
+                                       <tr>
+                                          <th>All Category</th>
+                                       </tr>
+                                    </thead>
+                                    <tbody>
+                                       <tr >
+                                          <td>
+                                             <?php while($row = mysqli_fetch_array($fakerCategory)){ ?>
+                                                <?php
+                                                   $category_id = $row['id'];
+                                                   $sql2 = "select faker_type.id, faker_type.name, faker_type.status
+                                                      from faker_type inner join faker_category
+                                                      on faker_type.category_id = faker_category.id where faker_category.status='1' and faker_type.category_id='$category_id'";
+                                                   $faker_type = mysqli_query($conn2, $sql2);
 
-                                                // Total faker type
-                                                $sql3 = "select * from faker_type where category_id='$category_id'";
-                                                $totalFaker2 = mysqli_query($conn2, $sql3);
-                                                $totalFaker = mysqli_num_rows($totalFaker2);
-                                             ?>
-                                             <div class="panel panel-default">
-                                                <div class="panel-heading" role="tab" id="headingTwo">
-                                                   <h6 class="panel-title row">
-                                                      <a class="collapsed col-10" role="button" class="text-danger" data-toggle="collapse" data-parent="#accordion" href="#collapse<?=$row['id'];?>" aria-expanded="false" aria-controls="collapse<?=$row['id'];?>"><?=$row['name'];?></a>                                      
-                                                      <div class="btn-group col row" role="group" aria-label="Basic example">
-                                                         <?php if($row['status']==true){ ?>
-                                                            <a class="btn btn-sm btn-primary p-1 col-6" href="action.php?categoryId=<?=$row['id'];?>&status=<?=$row['status'];?>" title="Click for inactive">Active</a>      
-                                                         <?php }else{ ?>                                                                        
-                                                            <a class="btn btn-sm btn-secondary p-1 col-6" href="action.php?categoryId=<?=$row['id'];?>&status=<?=$row['status'];?>" title="Click for active">Inactive</a>      
-                                                         <?php } ?>                                                   
-                                                         <span class="col-6 pt-2">Total : <?= ($totalFaker <10) ? '0'.$totalFaker : $totalFaker;?></span>
-                                                         <!-- ($totalFaker!=0 && $totalFaker <10) -->
-                                                      </div>
-                                                   </h6>
-                                                </div>
+                                                   // Total faker type
+                                                   $sql3 = "select * from faker_type where category_id='$category_id'";
+                                                   $totalFaker2 = mysqli_query($conn2, $sql3);
+                                                   $totalFaker = mysqli_num_rows($totalFaker2);
+                                                ?>
+                                                <div class="panel panel-default">
+                                                   <div class="panel-heading" role="tab" id="headingTwo">
+                                                      <h6 class="panel-title row">
+                                                         <a class="collapsed col-10" role="button" class="text-danger" data-toggle="collapse" data-parent="#accordion" href="#collapse<?=$row['id'];?>" aria-expanded="false" aria-controls="collapse<?=$row['id'];?>"><?=$row['name'];?></a>                                      
+                                                         <div class="btn-group col row" role="group" aria-label="Basic example">
+                                                            <?php if($row['status']==true){ ?>
+                                                               <a class="btn btn-sm btn-primary p-1 col-6" href="action.php?categoryId=<?=$row['id'];?>&status=<?=$row['status'];?>" title="Click for inactive">Active</a>      
+                                                            <?php }else{ ?>                                                                        
+                                                               <a class="btn btn-sm btn-secondary p-1 col-6" href="action.php?categoryId=<?=$row['id'];?>&status=<?=$row['status'];?>" title="Click for active">Inactive</a>      
+                                                            <?php } ?>                                                   
+                                                            <span class="col-6 pt-2">Total : <?= ($totalFaker <10) ? '0'.$totalFaker : $totalFaker;?></span>
+                                                            <!-- ($totalFaker!=0 && $totalFaker <10) -->
+                                                         </div>
+                                                      </h6>
+                                                   </div>
 
-                                                <div id="collapse<?=$row['id'];?>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
-                                                   <div class="panel-body row">
-                                                      <div class="col">
-                                                         <div class="tab-pane active">
-                                                           <?php
-                                                               $loop = 1;
-                                                               $headFirst = 1;
-                                                            ?>
-                                                            <div class="row my-1 mx-0">
-                                                               <?php while($row2 = mysqli_fetch_array($faker_type)){ ?>
-                                                                  <?php if($loop%2 !=0) {?>
-                                                                     <table id="example1" class="table table2 table-bordered table-striped col-6 mb-0">
-                                                                        <?php if($headFirst=='1'){?>
-                                                                           <thead>
-                                                                              <tr class="text-center">
-                                                                                 <th>Faker_Type</th>
-                                                                                 <th>Output</th>
-                                                                                 <th>Action</th>
-                                                                              </tr>
-                                                                           </thead>
-                                                                        <?php } ?>
-                                                                        <tbody>
-                                                                           <tr>
-                                                                              <td width="30%"><?= $title = $row2['name']; ?></td>
-                                                                              <td width="auto"><?= $faker->$title;?></td>
-                                                                              <td width="5%" class="p-0">
-                                                                                 <div class="btn-group p-1" role="group" aria-label="Basic example">
-                                                                                    <?php if($row2['status']==true){ ?>
-                                                                                       <a class="btn btn-sm btn-primary" href="action.php?fakerId=<?=$row2['id']; ?>&status=<?=$row2['status'];?>">Active</a>      
-                                                                                    <?php }else{ ?>                                                       
-                                                                                       <a class="btn btn-sm btn-secondary" href="action.php?fakerId=<?=$row2['id']; ?>&status=<?=$row2['status'];?>">Inactive</a>      
-                                                                                    <?php } ?>
-                                                                                    <a class="btn btn-sm btn-danger" href="action.php?fakerDeleteId=<?=$row2['id']; ?>" onclick="return confirm('Are you want to delete this?')">Delete</a>
-                                                                                 </div> 
-                                                                              </td>
-                                                                           <tr>                                             
-                                                                        </tbody>
-                                                                     </table>
-                                                                  <?php }else{ ?>
-                                                                     <table id="example1" class="table table2 table-bordered table-striped col-6 mb-0" id="table2">
-                                                                        <?php if($headFirst=='2'){?>
-                                                                           <thead>
-                                                                              <tr class="text-center">
-                                                                                 <th>Faker_Type</th>
-                                                                                 <th>Output</th>
-                                                                                 <th>Action</th>
-                                                                              </tr>
-                                                                           </thead>
-                                                                        <?php } ?>
-                                                                        <tbody>
-                                                                           <tr>
-                                                                              <td width="30%"><?= $title = $row2['name']; ?></td>
-                                                                              <td width="auto"><?= $faker->$title;?></td>
-                                                                              <td width="5%" class="p-0">
-                                                                                 <div class="btn-group p-1" role="group" aria-label="Basic example">
-                                                                                    <?php if($row2['status']==true){ ?>
-                                                                                       <a class="btn btn-sm btn-primary" href="action.php?fakerId=<?=$row2['id']; ?>&status=<?=$row2['status'];?>">Active</a>      
-                                                                                    <?php }else{ ?>                                                     
-                                                                                       <a class="btn btn-sm btn-secondary" href="action.php?fakerId=<?=$row2['id']; ?>&status=<?=$row2['status'];?>">Inactive</a>      
-                                                                                    <?php } ?>
-                                                                                    <a class="btn btn-sm btn-danger" href="action.php?fakerDeleteId=<?=$row2['id']; ?>" onclick="return confirm('Are you want to delete this?')">Delete</a>
-                                                                                 </div> 
-                                                                              </td>
-                                                                           <tr>                                             
-                                                                        </tbody>
-                                                                     </table>
-                                                                  <?php } ?>
-                                                               <?php $loop++; $headFirst++; } ?>              
+                                                   <div id="collapse<?=$row['id'];?>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                                                      <div class="panel-body row">
+                                                         <div class="col">
+                                                            <div class="tab-pane active">
+                                                              <?php
+                                                                  $loop = 1;
+                                                                  $headFirst = 1;
+                                                               ?>
+                                                               <div class="row my-1 mx-0">
+                                                                  <?php while($row2 = mysqli_fetch_array($faker_type)){ ?>
+                                                                     <?php if($loop%2 !=0) {?>
+                                                                        <table id="example1" class="table table2 table-bordered table-striped col-6 mb-0">
+                                                                           <?php if($headFirst=='1'){?>
+                                                                              <thead>
+                                                                                 <tr class="text-center">
+                                                                                    <th>Faker_Type</th>
+                                                                                    <th>Output</th>
+                                                                                    <th>Action</th>
+                                                                                 </tr>
+                                                                              </thead>
+                                                                           <?php } ?>
+                                                                           <tbody>
+                                                                              <tr>
+                                                                                 <td width="30%"><?= $title = $row2['name']; ?></td>
+                                                                                 <td width="auto"><?= $faker->$title;?></td>
+                                                                                 <td width="5%" class="p-0">
+                                                                                    <div class="btn-group p-1" role="group" aria-label="Basic example">
+                                                                                       <?php if($row2['status']==true){ ?>
+                                                                                          <a class="btn btn-sm btn-primary" href="action.php?fakerId=<?=$row2['id']; ?>&status=<?=$row2['status'];?>">Active</a>      
+                                                                                       <?php }else{ ?>                                                       
+                                                                                          <a class="btn btn-sm btn-secondary" href="action.php?fakerId=<?=$row2['id']; ?>&status=<?=$row2['status'];?>">Inactive</a>      
+                                                                                       <?php } ?>
+                                                                                       <a class="btn btn-sm btn-danger" href="action.php?fakerDeleteId=<?=$row2['id']; ?>" onclick="return confirm('Are you want to delete this?')">Delete</a>
+                                                                                    </div> 
+                                                                                 </td>
+                                                                              <tr>                                             
+                                                                           </tbody>
+                                                                        </table>
+                                                                     <?php }else{ ?>
+                                                                        <table id="example1" class="table table2 table-bordered table-striped col-6 mb-0" id="table2">
+                                                                           <?php if($headFirst=='2'){?>
+                                                                              <thead>
+                                                                                 <tr class="text-center">
+                                                                                    <th>Faker_Type</th>
+                                                                                    <th>Output</th>
+                                                                                    <th>Action</th>
+                                                                                 </tr>
+                                                                              </thead>
+                                                                           <?php } ?>
+                                                                           <tbody>
+                                                                              <tr>
+                                                                                 <td width="30%"><?= $title = $row2['name']; ?></td>
+                                                                                 <td width="auto"><?= $faker->$title;?></td>
+                                                                                 <td width="5%" class="p-0">
+                                                                                    <div class="btn-group p-1" role="group" aria-label="Basic example">
+                                                                                       <?php if($row2['status']==true){ ?>
+                                                                                          <a class="btn btn-sm btn-primary" href="action.php?fakerId=<?=$row2['id']; ?>&status=<?=$row2['status'];?>">Active</a>      
+                                                                                       <?php }else{ ?>                                                     
+                                                                                          <a class="btn btn-sm btn-secondary" href="action.php?fakerId=<?=$row2['id']; ?>&status=<?=$row2['status'];?>">Inactive</a>      
+                                                                                       <?php } ?>
+                                                                                       <a class="btn btn-sm btn-danger" href="action.php?fakerDeleteId=<?=$row2['id']; ?>" onclick="return confirm('Are you want to delete this?')">Delete</a>
+                                                                                    </div> 
+                                                                                 </td>
+                                                                              <tr>                                             
+                                                                           </tbody>
+                                                                        </table>
+                                                                     <?php } ?>
+                                                                  <?php $loop++; $headFirst++; } ?>              
+                                                               </div>
                                                             </div>
                                                          </div>
                                                       </div>
                                                    </div>
                                                 </div>
-                                             </div>
-                                          <?php } ?>
-                                       </td>
-                                    </tr>
-                                 </tbody>
-                              </table>
+                                             <?php } ?>
+                                          </td>
+                                       </tr>
+                                    </tbody>
+                                 </table>
+                              </div>
                            </div>
-                        </div>
-                     </fieldset>
-                  </div>
+                        </fieldset>
+                     </div>
+                  <?php } ?>
 
                </div>
             </div>

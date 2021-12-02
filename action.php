@@ -1,5 +1,5 @@
  <?php
- // row delete
+ 
    session_start();
 
    if (isset($_SESSION['dbName']) && isset($_SESSION['tableName'])){
